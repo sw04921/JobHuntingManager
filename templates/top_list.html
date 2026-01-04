@@ -1,0 +1,87 @@
+{% extends "index.html" %}
+
+{% block title %}top page{% endblock %}
+
+{% block header %}
+<h1 style="margin:0; font-size: 24px;">企業一覧</h1>
+<nav>
+    <!-- アンカーリンク -->
+    <a href="#company_table" class="header-link">一覧へ</a>
+    <a href="#regist_new_company" class="header-link">新規登録へ</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+<div class="content-box" id="company_table">
+    <div class="list-header">
+        <h3>登録済みの会社一覧</h3>
+
+        <div class="sort-buttons">
+            <span style="font-size: 12px; color: #666; margin-right: 5px;">並び替え:</span>
+            <a href="{{ url_for('index') }}" class="btn-sort">登録順</a>
+            <a href="{{ url_for('index', sort='interest') }}" class="btn-sort">志望度順</a>
+        </div>
+    </div>
+
+    <table class="company-table">
+        <thead>
+            <tr>
+                <th style="width: 40%;">会社名</th>
+                <th style="width: 30%;">志望度</th>
+                <th style="width: 30%; text-align: center;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('show_detail', id=company.id) }}"
+                        style="font-weight: bold; color: #007bff; text-decoration: none;">
+                        {{ company.name }}
+                    </a>
+                </td>
+                <td>
+                    {% if company.interest %}
+                    <span class="interest-badge">★ {{ company.interest }}</span>
+                    {% else %}
+                    <span style="color: #ccc; font-size: 12px;">-</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center;">
+                    <form action="{{ url_for('delete_company', id=company.id) }}" method="POST"
+                        onsubmit="return confirm('本当に削除しますか？');">
+                        <input type="submit" value="削除" class="btn btn-delete"
+                            style="padding: 4px 10px; font-size: 12px;">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not companies %}
+    <p style="text-align: center; color: #777; margin-top: 20px;">
+        まだ登録された企業はありません。<br>
+        右上の「新規登録へ」から追加してください。
+    </p>
+    {% endif %}
+</div>
+
+<div class="content-box" id="regist_new_company">
+    <div class="info-header">
+        <h3>会社情報の登録</h3>
+    </div>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" novalidate>
+        {{ regist_form.csrf_token }}
+        <span>{{ render_field(regist_form.name) }}</span>
+        <span>{{ render_field(regist_form.industry) }}</span>
+        <span>{{ render_field(regist_form.url) }}</span>
+        {{ regist_form.submit(class="btn btn-register") }}
+    </form>
+</div>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}

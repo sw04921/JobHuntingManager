@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ページタイトル{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header class="sticky-header">
+            {% block header %}ヘッダー{% endblock %}
+        </header>
+        {% block content %}内容{% endblock %}
+        {% block footer %}フッター{% endblock %}
+    </div>
+</body>
+
+</html>

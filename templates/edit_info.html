@@ -1,0 +1,21 @@
+{% extends "detail.html" %}
+{% block header %}
+<h1 style="margin:0; font-size: 20px;">{{ company.name }}の基本情報</h1>
+{% endblock %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method="POST" novalidate>
+    {{ edit_form.csrf_token }}
+    {{ render_field(edit_form.name) }}
+    {{ render_field(edit_form.industry) }}
+    {{ render_field(edit_form.url)}}
+    {{ render_field(edit_form.entry_date)}}
+    {{ render_field(edit_form.status)}}
+    {{ render_field(edit_form.phase)}}
+    {{ edit_form.change(class="btn btn-register") }}
+</form>
+{% endblock %}
+
+{% block detail_info %}{% endblock %}
+{% block event_info %}{% endblock %}

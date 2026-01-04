@@ -1,0 +1,451 @@
+/* ================== */
+/* --- レイアウト --- */
+/* ================== */
+
+/* 画面の中央に寄せる箱 */
+.container {
+    max-width: 800px;
+    /* 横幅の最大値を決める（スマホなら縮む） */
+    margin: 0 auto;
+    /* 上下は0、左右は「自動（auto）」＝中央寄せ */
+    padding: 20px;
+    /* 内側に少し余白を作る */
+    background-color: #fefefe;
+    /* 背景色 */
+
+    /* 影 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 背景に少し色をつけると、コンテナが際立つ */
+body {
+    background-color: #f4f4f4;
+    /* 薄いグレー */
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    /* フォント */
+    margin: 0;
+}
+
+/* ============================ */
+/* --- スクロール追従ヘッダー --- */
+/* ============================ */
+
+.sticky-header {
+    position: sticky;
+    /* これが魔法の言葉 */
+    top: 0;
+    /* 画面の一番上で止まるように指定 */
+    background-color: rgba(255, 255, 255, 0.95);
+    /* 背景色 */
+    padding: 15px 0;
+    /* 上下の余白 */
+    border-bottom: 2px solid #eee;
+    /* 下に境界線 */
+    z-index: 1000;
+    /* 他の要素より手前に表示する（アコーディオン等の上にくる） */
+
+    /* 横並びにする設定 */
+    display: flex;
+    justify-content: space-between;
+    /* 左右に要素を配置 */
+    align-items: center;
+    /* 上下中央揃え */
+}
+
+/* ヘッダー内のリンク（ボタン風） */
+.header-link {
+    font-size: 14px;
+    margin-left: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ============================== */
+/* --- 基本情報エリアのデザイン --- */
+/* ============================== */
+
+.content-box {
+    background-color: #fff;
+    /* 背景白 */
+    border: 1px solid #ddd;
+    /* 薄い枠線 */
+    padding: 25px;
+    /* 内側の余白 */
+    border-radius: 8px;
+    /* 角丸 */
+    margin-bottom: 30px;
+    /* 下の箱との隙間 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    /* 影 */
+    margin-top: 10px;
+}
+
+/* 箱の中の見出し（h3）を統一 */
+.content-box h3 {
+    padding-bottom: 5px;
+    font-size: 18px;
+    color: #333;
+}
+
+/* タイトルとボタンを横並びにする */
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 5px;
+}
+
+.info-header h3 {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+/* 左右2列にする */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 1:1 の比率で2列 */
+    gap: 30px;
+    /* 真ん中の隙間 */
+}
+
+/* スマホの時は1列にする */
+@media (max-width: 600px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+        /* 1列に変更 */
+        gap: 10px;
+    }
+}
+
+/* 各項目のデザイン */
+.info-item {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    /* 上下に積む */
+}
+
+.label {
+    font-size: 12px;
+    color: #777;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.value {
+    font-size: 16px;
+    color: #333;
+    word-break: break-all;
+    /* 長いURLなどは折り返す */
+}
+
+/* 状況を目立たせる */
+.status-badge {
+    display: inline-block;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ==================== */
+/* --- 表のデザイン --- */
+/* ==================== */
+
+/* 1. 表全体の基本設定 */
+.company-table {
+    width: 100%;
+    /* 横幅いっぱいに */
+    border-collapse: collapse;
+    /* 枠線の隙間をなくす（二重線防止） */
+    margin-top: 20px;
+    /* 上に少し隙間をあける */
+    font-size: 16px;
+    /* 文字サイズ */
+}
+
+/* 2. 見出し（thead）とデータ（td）の共通設定 */
+.company-table th,
+.company-table td {
+    padding: 12px 15px;
+    /* 文字の周りに余白を入れてふっくらさせる */
+    border-bottom: 1px solid #ddd;
+    /* 下にうすい線だけ引く */
+    text-align: left;
+    /* 左寄せ */
+}
+
+/* 3. 見出し（thead）だけの設定 */
+.company-table th {
+    background-color: #b6ffb8;
+    /* ヘッダー色 */
+}
+
+/* 4. マウスが乗った時に色を変える */
+.company-table tr:hover {
+    background-color: #f5f5f5;
+    /* 薄いグレーに */
+    cursor: pointer;
+    /* マウスカーソルを指の形に */
+}
+
+/* 5. 偶数行だけ色を変える */
+.company-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* --- トップページ（リスト）のヘッダー --- */
+.list-header {
+    display: flex;
+    /* 横並びにする */
+    justify-content: space-between;
+    /* 左右の端に配置 */
+    align-items: center;
+    /* 上下の高さを合わせる */
+    margin-bottom: 20px;
+    /* 表との隙間 */
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+/* 既存のh3の設定をリセットして調整 */
+.list-header h3 {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    font-size: 18px;
+}
+
+/* --- 並び替えボタン --- */
+.btn-sort {
+    text-decoration: none;
+    color: #555;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 20px;
+    /* 楕円形にする */
+    font-size: 12px;
+    transition: 0.2s;
+    margin-left: 5px;
+}
+
+.btn-sort:hover {
+    background-color: #e2e6ea;
+    color: #333;
+}
+
+/* --- 志望度のバッジ --- */
+.interest-badge {
+    background-color: #fff3cd;
+    /* 薄い黄色 */
+    color: #856404;
+    /* 濃い黄色文字 */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* テーブルの見出し調整 */
+.company-table th {
+    background-color: #f1f1f1;
+    /* 少し落ち着いたグレーに（緑がきつい場合） */
+    color: #333;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+/* ============================== */
+/* --- アコーディオンのデザイン --- */
+/* ============================== */
+
+/* 1. 全体の枠組み */
+.schedule-accordion {
+    margin-bottom: 10px;
+    /* 下に少し隙間をあける */
+    border: 1px solid #999999;
+    /* 薄い枠線をつける */
+    border-radius: 5px;
+    /* 角を少し丸くする */
+    overflow: hidden;
+    /* はみ出た部分を隠す（角丸用） */
+}
+
+/* 2. クリックする部分（summary）のデザイン */
+.schedule-accordion summary {
+    background-color: #eef1f5;
+    /* 薄いグレーの背景色 */
+    padding: 10px 15px;
+    /* 余白 */
+    font-weight: bold;
+    /* 文字を太く */
+    cursor: pointer;
+    /* マウスを指の形に */
+    list-style: none;
+    /* デフォルトの「▶」を消す */
+    display: flex;
+    /* 中身をフレックス（並列）モードにする */
+    justify-content: space-between;
+    /* 要素を「左端」と「右端」に離して配置 */
+    align-items: center;
+    /* 上下の高さを真ん中に揃える */
+}
+
+/* Chromeなどのブラウザで「▶」を完全に消す */
+.schedule-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+/* 3. 開いている時の色変え */
+.schedule-accordion[open] summary {
+    background-color: #c4ffd3;
+    /* 開いたら青色に */
+}
+
+/* 4. 開いた中身のデザイン */
+.accordion-content {
+    padding: 15px;
+    /* 中身に余白を与える */
+    background-color: #ffffff;
+    /* 背景色 */
+    line-height: 1.6;
+    /* 行間を広げる */
+}
+
+/* =======================*/
+/* --- ボタンのデザイン --- */
+/* =======================*/
+
+/* 1. 全ボタン共通の形 */
+.btn {
+    display: inline-block;
+    /* ボタンとしての形を保つ */
+    text-decoration: none;
+    /* 下線を消す */
+    padding: 8px 16px;
+    /* ボタンの大きさ（内側の余白） */
+    border-radius: 4px;
+    /* 角を少し丸く */
+    font-size: 14px;
+    /* 文字サイズ */
+    border: none;
+    /* 枠線を消す */
+    cursor: pointer;
+    /* マウスを指の形に */
+    transition: 0.3s;
+    /* ゆっくり色が変わる */
+    box-sizing: border-box;
+    /* 余白込みのサイズで計算 */
+}
+
+/* --- イベント登録ボタン --- */
+.btn-register {
+    background-color: #007bff;
+    /* 背景色 */
+    color: white;
+    /* 文字色 */
+    font-weight: bold;
+    /* 少し太文字にして強調 */
+    display: block;
+    /* ブロック要素にする */
+    width: 100%;
+    /* 横幅MAX */
+    margin-top: 10px;
+    /* 上に少し隙間 */
+}
+
+/* マウスを乗せた時の変化 */
+.btn-register:hover {
+    background-color: #0056b3;
+    /* 少し濃い青になる */
+    transform: translateY(-2px);
+    /* ボタンが少し浮き上がる */
+}
+
+/* 2. 編集ボタン */
+.btn-edit {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #218838;
+    /* マウスを乗せたら少し濃く */
+}
+
+/* 3. 戻るボタン */
+.btn-back {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #0056b3;
+}
+
+/* 4. 削除ボタン */
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* ============================ */
+/* --- フォームのデザイン修正 --- */
+/* ============================ */
+
+/* 1. テキストボックスの設定 */
+input[type="text"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    /* 横幅を親要素（コンテナ）いっぱいに広げる */
+    padding: 10px;
+    /* 内側に余白を入れて入力しやすく */
+    margin-bottom: 15px;
+    /* 次の項目のために下に隙間をあける */
+    border: 1px solid #ccc;
+    /* 薄いグレーの枠線 */
+    border-radius: 4px;
+    /* 角を少し丸く */
+    box-sizing: border-box;
+    /* 【重要】枠線や余白を含めて「100%」にする設定 */
+    font-size: 16px;
+    /* 文字サイズ（スマホでズームされない大きさ） */
+}
+
+/* 2. メモ欄の高さを確保 */
+textarea {
+    height: 100px;
+    /* 最初から少し高さをとっておく */
+    resize: vertical;
+    /* 縦方向だけサイズ変更できるようにする */
+}
+
+/* 3. ラベル（「イベント名：」などの文字）の設定 */
+label {
+    display: block;
+    /* ラベルが「ブロック」になり、強制的に改行される */
+    font-weight: bold;
+    /* 太文字にして見出しっぽく */
+    margin-bottom: 5px;
+    /* 入力欄との距離を少しあける */
+    color: #333;
+    /* 文字色を少し濃く */
+}
+
+/* 4. WTFormsが勝手につける <p> タグの余白をリセット */
+form p {
+    margin: 0;
+    /* 変な隙間をなくす */
+}

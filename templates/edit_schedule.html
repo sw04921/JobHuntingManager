@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+
+{% block title %}edit event{% endblock %}
+
+{% block header %}<h1>EDIT EVENT</h1>{% endblock %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method="POST" novalidate>
+    {{ schedule_form.csrf_token }}
+    {{ render_field(schedule_form.event_name) }}
+    {{ render_field(schedule_form.event_content) }}
+    {{ render_field(schedule_form.event_date)}}
+    {{ render_field(schedule_form.event_memo)}}
+    {{ schedule_form.change(class="btn btn-register") }}
+</form>
+{% endblock %}
+
+{% block footer %}{% endblock %}

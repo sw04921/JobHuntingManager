@@ -1,0 +1,140 @@
+{% extends "index.html" %}
+
+{% block title %}detail{% endblock %}
+
+<!--
+======== ヘッダー ===========
+-->
+{% block header %}
+<div style="display: flex; align-items: center;">
+    <h1 style="margin:0; font-size: 20px;">{{ company.name }}</h1>
+</div>
+<nav>
+    <!-- アンカーリンク -->
+    <a href="#add-event" class="header-link btn btn-primary">＋ イベント追加</a>
+    {% from "_formhelpers.html" import render_field %}
+    <!-- 保存して戻るボタン -->
+    {{ info_form.toTopPage(class="btn btn-back", form="company-info-form") }}
+</nav>
+{% endblock %}
+
+<!--
+======== 会社情報 ===========
+-->
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method="POST" id="company-info-form" novalidate>
+    <!-- 基本情報のブロック　edit_modeで編集できるようになる-->
+    <div class="content-box">
+        {% block base_info %}
+        <div class="info-header">
+            <h3>基本情報</h3>
+            <a href="{{ url_for('edit_company', id=company.id) }}" class="btn btn-edit">編集</a>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-group">
+                <div class="info-item">
+                    <span class="label">会社名</span>
+                    <span class="value">{{ company.name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">業界</span>
+                    <span class="value">{{ company.industry }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">マイページURL</span>
+                    <span class="value">
+                        {% if company.url %}
+                        <a href="{{ company.url }}" target="_blank" rel="noopener">リンクを開く &#x2197;</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-item">
+                    <span class="label">現在の状況</span>
+                    <span class="value status-badge">{{ company.selection.status }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">フェーズ</span>
+                    <span class="value">{{ company.selection.phase }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">エントリー日</span>
+                    <span class="value">{{ company.selection.entry_date }}</span>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+
+        <!-- 詳細情報のブロック　edit_modeでは編集不可-->
+        {% block detail_info %}
+        <div class="info-header">
+            <h3>詳細情報</h3>
+        </div>
+        {% from "_formhelpers.html" import render_field %}
+        {{ info_form.csrf_token }}
+        <div class="info-grid">
+            <div class="info-item">
+                {{ render_field(info_form.interest) }}
+            </div>
+            <div class="info-item">
+                {{ render_field(info_form.memo) }}
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+</form>
+
+<!--
+======== イベント一覧 ===========
+-->
+{% block event_info %}
+<div class="content-box">
+    <h3 id="event-list">イベント一覧</h3>
+    {% for schedule in company.schedules %}
+    <details class="schedule-accordion">
+        <summary>
+            <span>{{ schedule.event_date }}：{{ schedule.event_name }}</span>
+            <a href="{{ url_for('edit_event', id=schedule.id) }}" class="btn btn-edit">編集</a>
+        </summary>
+        <div class="accordion-content">
+            <p>内容：{{ schedule.event_content }}</p>
+            <p>メモ：{{ schedule.event_memo }}</p>
+            <form action="{{ url_for('delete_event', id=schedule.id) }}" method="POST">
+                <!-- イベント削除ボタン -->
+                <input type="submit" value="削除" class="btn btn-delete">
+            </form>
+        </div>
+    </details>
+    {% else %}
+    <p>イベントは登録されていません</p>
+    {% endfor %}
+</div>
+
+<!--
+======== イベント登録 ===========
+-->
+<div class="content-box" id="add-event">
+    <div class="info-header">
+        <h3>新規イベント登録</h3>
+    </div>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" novalidate>
+        {{ schedule_form.csrf_token }}
+        {{ render_field(schedule_form.event_name) }}
+        {{ render_field(schedule_form.event_content) }}
+        {{ render_field(schedule_form.event_date)}}
+        {{ render_field(schedule_form.event_memo)}}
+        {{ schedule_form.submit(class="btn btn-register") }}
+    </form>
+</div>
+{% endblock %}
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
