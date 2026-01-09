@@ -1,9 +1,9 @@
 {% extends "index.html" %}
 
-{% block title %}top page{% endblock %}
+{% block title %}トップページ{% endblock %}
 
 {% block header %}
-<h1 style="margin:0; font-size: 24px;">企業一覧</h1>
+<h1 style="margin:0; font-size: 24px;">就活管理</h1>
 <nav>
     <!-- アンカーリンク -->
     <a href="#company_table" class="header-link">一覧へ</a>
@@ -19,17 +19,24 @@
 
         <div class="sort-buttons">
             <span style="font-size: 12px; color: #666; margin-right: 5px;">並び替え:</span>
-            <a href="{{ url_for('index') }}" class="btn-sort">登録順</a>
-            <a href="{{ url_for('index', sort='interest') }}" class="btn-sort">志望度順</a>
+            <a href="{{ url_for('index', industry=request.args.get('industry')) }}" class="btn-sort">登録順</a>
+            <a href="{{ url_for('index', sort='interest', industry=request.args.get('industry')) }}"
+                class="btn-sort">志望度順</a>
         </div>
         <div>
+            <span style="font-size: 12px; color: #666; margin-right: 5px;">絞り込み</span>
             <form action="/" method="GET">
-                <select name="industry">
-                    <option value="">すべて</option>
-                    <option value="IT">IT</option>
-                    <option value="製造">製造</option>
+                <!-- 並び替えと絞り込みを同時にできるようにする -->
+                <input type="hidden" name="sort" value="{{ request.args.get('sort', '') }}">
+                <select name="industry" onchange="this.form.submit()">
+                    <!-- ページ更新後も選択された状態にする -->
+                    <option value="" {% if not request.args.get('industry') %}selected{% endif %}>すべて</option>
+                    {% for industry in industries %}
+                    <option value="{{ industry }}" {% if request.args.get('industry')==industry %}selected{% endif %}>{{
+                        industry }}
+                    </option>
+                    {% endfor %}
                 </select>
-                <button type="submit" class="btn-sort">絞り込み</button>
             </form>
         </div>
     </div>
@@ -37,9 +44,10 @@
     <table class="company-table">
         <thead>
             <tr>
-                <th style="width: 40%;">会社名</th>
-                <th style="width: 30%;">志望度</th>
-                <th style="width: 30%; text-align: center;">操作</th>
+                <th>会社名</th>
+                <th>業界</th>
+                <th>志望度</th>
+                <th style="text-align: center;">操作</th>
             </tr>
         </thead>
         <tbody>
@@ -50,6 +58,9 @@
                         style="font-weight: bold; color: #007bff; text-decoration: none;">
                         {{ company.name }}
                     </a>
+                </td>
+                <td>
+                    <span>{{ company.industry }}</span>
                 </td>
                 <td>
                     {% if company.interest %}

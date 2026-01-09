@@ -72,13 +72,17 @@ def index():
     sort_mode = request.args.get('sort')
     filter_industry = request.args.get('industry')
     query = Company.query
-    if filter_industry != '':
+    all_companies = Company.query.all()
+    # 存在する企業名の配列を作成　すべての企業からNone以外を集めて、set()で重複を削除、listで配列に戻して、sortedで並べ替え
+    # 並べ替えるとページ更新時に見やすくなる
+    industries = sorted(list(set([c.industry for c in all_companies if c.industry])))
+    if filter_industry:
+        # 業界で絞り込み
         query = query.filter(Company.industry == filter_industry)
     if sort_mode == 'interest':
         # 志望度順に並び替え　.desc()で降順にする
-        companies = query.order_by(Company.interest.desc()).all()
-    else:
-        companies = query.all()
+        query = query.order_by(Company.interest.desc())
+    companies = query.all()
     # POST
     if regist_form.validate_on_submit(): # requeset.method == "POST" and form.validate()と同じ意味
         new_company = Company(name=regist_form.name.data, industry=regist_form.industry.data, url=regist_form.url.data)
@@ -87,7 +91,7 @@ def index():
         # REDIRECT
         return redirect(url_for('index', _anchor=('regist_new_company')))
     # GET
-    return render_template('top_list.html', companies=companies, regist_form=regist_form)
+    return render_template('top_list.html', companies=companies, regist_form=regist_form, industries=industries)
 ### PRGパターン
 ### redirectがないと二重にPOSTされる可能性がある。
 ### redirectを書かなかったとき、フォームに入力後エンターキーを押したらDBに登録されたが表示はされなかった。
@@ -171,6 +175,7 @@ def edit_company(id):
 def edit_event(id):
     target = Schedule.query.filter_by(id=id).first()
     schedule_form = ScheduleForm(obj=target) # DBに登録された情報をフォームの初期値とする
+    event_company = Company.query.filter_by(target.company_id).first()
     # POST
     if schedule_form.validate_on_submit():
         target.event_name = schedule_form.event_name.data
@@ -181,7 +186,7 @@ def edit_event(id):
         # REDIRECT
         return redirect(url_for('show_detail', id=target.company_id))
     # GET
-    return render_template('edit_schedule.html', schedule_form=schedule_form)
+    return render_template('edit_schedule.html', schedule_form=schedule_form, event_company=event_company)
 
 
 if __name__ == '__main__':
