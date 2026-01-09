@@ -45,23 +45,33 @@
         <thead>
             <tr>
                 <th>会社名</th>
-                <th>業界</th>
+                <th style="text-align: center;">業界</th>
                 <th>志望度</th>
+                <th style="text-align: center;">選考状況</th>
                 <th style="text-align: center;">操作</th>
             </tr>
         </thead>
         <tbody>
             {% for company in companies %}
-            <tr>
+            <tr class="
+                {% if company.selection.status == '内々定' %}
+                    row-gold
+                {% elif company.selection.status == '辞退' or company.selection.status == 'お祈り' %}
+                    row-gray
+                {% endif %}
+            ">
+                <!-- 会社名 -->
                 <td>
                     <a href="{{ url_for('show_detail', id=company.id) }}"
                         style="font-weight: bold; color: #007bff; text-decoration: none;">
                         {{ company.name }}
                     </a>
                 </td>
-                <td>
+                <!-- 業界 -->
+                <td style="text-align: center;">
                     <span>{{ company.industry }}</span>
                 </td>
+                <!-- 志望度 -->
                 <td>
                     {% if company.interest %}
                     <span class="interest-badge">★ {{ company.interest }}</span>
@@ -69,6 +79,11 @@
                     <span style="color: #ccc; font-size: 12px;">-</span>
                     {% endif %}
                 </td>
+                <!-- 選考状況 -->
+                <td style="text-align: center;">
+                    <span>{{ company.selection.status }}</span>
+                </td>
+                <!-- 削除選択 -->
                 <td style="text-align: center;">
                     <form action="{{ url_for('delete_company', id=company.id) }}" method="POST"
                         onsubmit="return confirm('本当に削除しますか？');">

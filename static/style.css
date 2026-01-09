@@ -199,7 +199,22 @@ body {
     background-color: #f9f9f9;
 }
 
+/* 内々定の会社の列 */
+.row-gold {
+    background-color: #fff3cd !important;
+    border: 2px solid gold;
+}
+
+/* 辞退・お祈りの会社の列 */
+.row-gray {
+    background-color: #cdcdcd !important;
+    border: 2px solid gray;
+}
+
+/* ===================================== */
 /* --- トップページ（リスト）のヘッダー --- */
+/* ===================================== */
+
 .list-header {
     display: flex;
     /* 横並びにする */
