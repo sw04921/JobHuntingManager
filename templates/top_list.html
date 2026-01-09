@@ -22,6 +22,16 @@
             <a href="{{ url_for('index') }}" class="btn-sort">登録順</a>
             <a href="{{ url_for('index', sort='interest') }}" class="btn-sort">志望度順</a>
         </div>
+        <div>
+            <form action="/" method="GET">
+                <select name="industry">
+                    <option value="">すべて</option>
+                    <option value="IT">IT</option>
+                    <option value="製造">製造</option>
+                </select>
+                <button type="submit" class="btn-sort">絞り込み</button>
+            </form>
+        </div>
     </div>
 
     <table class="company-table">

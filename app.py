@@ -70,11 +70,15 @@ from forms import RegistForm, EditForm, DetailForm, ScheduleForm
 def index():
     regist_form = RegistForm()
     sort_mode = request.args.get('sort')
+    filter_industry = request.args.get('industry')
+    query = Company.query
+    if filter_industry != '':
+        query = query.filter(Company.industry == filter_industry)
     if sort_mode == 'interest':
         # 志望度順に並び替え　.desc()で降順にする
-        companies = Company.query.order_by(Company.interest.desc()).all()
+        companies = query.order_by(Company.interest.desc()).all()
     else:
-        companies = Company.query.all()
+        companies = query.all()
     # POST
     if regist_form.validate_on_submit(): # requeset.method == "POST" and form.validate()と同じ意味
         new_company = Company(name=regist_form.name.data, industry=regist_form.industry.data, url=regist_form.url.data)
