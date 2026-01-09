@@ -175,7 +175,7 @@ def edit_company(id):
 def edit_event(id):
     target = Schedule.query.filter_by(id=id).first()
     schedule_form = ScheduleForm(obj=target) # DBに登録された情報をフォームの初期値とする
-    event_company = Company.query.filter_by(target.company_id).first()
+    event_company = Company.query.filter_by(id=target.company_id).first()
     # POST
     if schedule_form.validate_on_submit():
         target.event_name = schedule_form.event_name.data
