@@ -6,10 +6,10 @@
 ======== ヘッダー ===========
 -->
 {% block header %}
-<div style="display: flex; align-items: center;">
-    <h1 style="margin:0; font-size: 20px;">{{ company.name }}</h1>
+<div class="title-group">
+    <h1>{{ company.name }}</h1>
 </div>
-<nav>
+<nav class="action-buttons">
     <!-- アンカーリンク -->
     <a href="#add-event" class="header-link btn btn-primary">＋ イベント追加</a>
     {% from "_formhelpers.html" import render_field %}
