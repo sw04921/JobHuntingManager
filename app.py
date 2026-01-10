@@ -127,10 +127,14 @@ def show_detail(id):
     return render_template('detail.html', company=target, info_form=info_form, schedule_form=schedule_form)
 
 # 会社情報削除処理
-@app.route('/delete/<int:id>', methods=['POST'])
-def delete_company(id):
-    target = Company.query.filter_by(id=id).first()
-    db.session.delete(target)
+@app.route('/delete_selected', methods=['POST'])
+def delete_company():
+    ids = request.form.getlist('delete_targets')
+    for delete_id in ids:
+        target = Company.query.filter_by(id=delete_id).first()
+        # 存在しない会社を削除しようとしてエラーになるのを防ぐ
+        if target:
+            db.session.delete(target)
     db.session.commit()
     return redirect(url_for('index'))
 

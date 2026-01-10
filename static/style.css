@@ -153,6 +153,111 @@ body {
     font-size: 14px;
 }
 
+/* ===================================== */
+/* --- トップページ（リスト）のヘッダー --- */
+/* ===================================== */
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    /* 左右に離す */
+    align-items: center;
+    margin-bottom: 15px;
+    /* 下段（ツールバー）との隙間 */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    /* 薄い区切り線 */
+}
+
+.list-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+/* --- 並び替えボタン --- */
+.btn-sort {
+    text-decoration: none;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-left: 5px;
+    transition: 0.2s;
+}
+
+.btn-sort:hover {
+    background-color: #e9ecef;
+    color: #000;
+}
+
+/* --- 志望度のバッジ --- */
+.interest-badge {
+    background-color: #fff3cd;
+    /* 薄い黄色 */
+    color: #856404;
+    /* 濃い黄色文字 */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* テーブルの見出し調整 */
+.company-table th {
+    background-color: #f1f1f1;
+    /* 少し落ち着いたグレーに（緑がきつい場合） */
+    color: #333;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+.toolbar-container {
+    display: flex;
+    justify-content: space-between;
+    /* 左に絞り込み、右に削除ボタン */
+    align-items: center;
+    margin-bottom: 10px;
+    /* 表との隙間 */
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    /* 背景色をつけてエリアを明確に */
+    border-radius: 8px;
+}
+
+/* 絞り込みエリア */
+.filter-label {
+    font-weight: bold;
+    color: #555;
+    margin-right: 8px;
+}
+
+.select-industry {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* 削除ボタン（赤くて目立つように） */
+.btn-delete-action {
+    background-color: #dc3545;
+    /* 警告の赤 */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-delete-action:hover {
+    background-color: #c82333;
+    /* ホバー時に少し濃く */
+}
+
 /* ==================== */
 /* --- 表のデザイン --- */
 /* ==================== */
@@ -199,82 +304,32 @@ body {
     background-color: #f9f9f9;
 }
 
-/* 内々定の会社の列 */
+/* チェックボックスのスタイル */
+input[type="checkbox"] {
+    transform: scale(1.5);
+    /* 1.5倍に拡大 */
+    margin-right: 10px;
+    /* 隣の文字との隙間 */
+    cursor: pointer;
+    /* カーソルを指にする */
+}
+
+/* 内々定の会社の行 */
 .row-gold {
-    background-color: #fff3cd !important;
-    border: 2px solid gold;
+    background-color: #fff0f5 !important;
+    /* 薄いピンク */
+    border-left: 6px solid #ff69b4 !important;
+    /* 左端に濃いピンクの線 */
+    color: #333;
 }
 
-/* 辞退・お祈りの会社の列 */
+/* 辞退・お祈りの会社の行 */
 .row-gray {
-    background-color: #cdcdcd !important;
-    border: 2px solid gray;
+    background-color: #f1f3f5 !important;
+    color: #adb5bd !important;
+    /* 文字をグレーにして目立たなくする */
 }
 
-/* ===================================== */
-/* --- トップページ（リスト）のヘッダー --- */
-/* ===================================== */
-
-.list-header {
-    display: flex;
-    /* 横並びにする */
-    justify-content: space-between;
-    /* 左右の端に配置 */
-    align-items: center;
-    /* 上下の高さを合わせる */
-    margin-bottom: 20px;
-    /* 表との隙間 */
-    padding-bottom: 10px;
-    border-bottom: 2px solid #eee;
-}
-
-/* 既存のh3の設定をリセットして調整 */
-.list-header h3 {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    font-size: 18px;
-}
-
-/* --- 並び替えボタン --- */
-.btn-sort {
-    text-decoration: none;
-    color: #555;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    border-radius: 20px;
-    /* 楕円形にする */
-    font-size: 12px;
-    transition: 0.2s;
-    margin-left: 5px;
-}
-
-.btn-sort:hover {
-    background-color: #e2e6ea;
-    color: #333;
-}
-
-/* --- 志望度のバッジ --- */
-.interest-badge {
-    background-color: #fff3cd;
-    /* 薄い黄色 */
-    color: #856404;
-    /* 濃い黄色文字 */
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-/* テーブルの見出し調整 */
-.company-table th {
-    background-color: #f1f1f1;
-    /* 少し落ち着いたグレーに（緑がきつい場合） */
-    color: #333;
-    font-weight: bold;
-    border-bottom: 2px solid #ddd;
-}
 
 /* ============================== */
 /* --- アコーディオンのデザイン --- */

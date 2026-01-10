@@ -16,85 +16,93 @@
 <div class="content-box" id="company_table">
     <div class="list-header">
         <h3>登録済みの会社一覧</h3>
-
         <div class="sort-buttons">
             <span style="font-size: 12px; color: #666; margin-right: 5px;">並び替え:</span>
             <a href="{{ url_for('index', industry=request.args.get('industry')) }}" class="btn-sort">登録順</a>
             <a href="{{ url_for('index', sort='interest', industry=request.args.get('industry')) }}"
                 class="btn-sort">志望度順</a>
         </div>
-        <div>
-            <span style="font-size: 12px; color: #666; margin-right: 5px;">絞り込み</span>
-            <form action="/" method="GET">
+    </div>
+    <div class="toolbar-container">
+        <div class="filter-box">
+            <form action="{{ url_for('index') }}" method="GET" class="filter-form">
+                <span class="filter-label">業界で絞り込み:</span>
                 <!-- 並び替えと絞り込みを同時にできるようにする -->
                 <input type="hidden" name="sort" value="{{ request.args.get('sort', '') }}">
-                <select name="industry" onchange="this.form.submit()">
+                <select name="industry" onchange="this.form.submit()" class="select-industry">
                     <!-- ページ更新後も選択された状態にする -->
-                    <option value="" {% if not request.args.get('industry') %}selected{% endif %}>すべて</option>
+                    <option value="" {% if not request.args.get('industry') %}selected{% endif %}>すべて表示</option>
                     {% for industry in industries %}
-                    <option value="{{ industry }}" {% if request.args.get('industry')==industry %}selected{% endif %}>{{
-                        industry }}
+                    <option value="{{ industry }}" {% if request.args.get('industry')==industry %}selected{% endif %}>
+                        {{ industry }}
                     </option>
                     {% endfor %}
                 </select>
             </form>
         </div>
+
+        <button type="submit" form="delete-form" class="btn-delete-action">
+            チェックした項目を削除
+        </button>
+
     </div>
 
-    <table class="company-table">
-        <thead>
-            <tr>
-                <th>会社名</th>
-                <th style="text-align: center;">業界</th>
-                <th>志望度</th>
-                <th style="text-align: center;">選考状況</th>
-                <th style="text-align: center;">操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for company in companies %}
-            <tr class="
+    <!-------------------------------->
+    <!--           一覧表           -->
+    <!-------------------------------->
+    <form id="delete-form" action="{{ url_for('delete_company', delete_targets=delete_targets) }}" method="POST"
+        onsubmit="return confirm('本当に削除しますか？');">
+        <table class="company-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>会社名</th>
+                    <th style="text-align: center;">業界</th>
+                    <th>志望度</th>
+                    <th style="text-align: center;">選考状況</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr class="
                 {% if company.selection.status == '内々定' %}
                     row-gold
                 {% elif company.selection.status == '辞退' or company.selection.status == 'お祈り' %}
                     row-gray
                 {% endif %}
-            ">
-                <!-- 会社名 -->
-                <td>
-                    <a href="{{ url_for('show_detail', id=company.id) }}"
-                        style="font-weight: bold; color: #007bff; text-decoration: none;">
-                        {{ company.name }}
-                    </a>
-                </td>
-                <!-- 業界 -->
-                <td style="text-align: center;">
-                    <span>{{ company.industry }}</span>
-                </td>
-                <!-- 志望度 -->
-                <td>
-                    {% if company.interest %}
-                    <span class="interest-badge">★ {{ company.interest }}</span>
-                    {% else %}
-                    <span style="color: #ccc; font-size: 12px;">-</span>
-                    {% endif %}
-                </td>
-                <!-- 選考状況 -->
-                <td style="text-align: center;">
-                    <span>{{ company.selection.status }}</span>
-                </td>
-                <!-- 削除選択 -->
-                <td style="text-align: center;">
-                    <form action="{{ url_for('delete_company', id=company.id) }}" method="POST"
-                        onsubmit="return confirm('本当に削除しますか？');">
-                        <input type="submit" value="削除" class="btn btn-delete"
-                            style="padding: 4px 10px; font-size: 12px;">
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                ">
+                    <!-- 削除選択 -->
+                    <td style="text-align: center;">
+                        <input type="checkbox" name="delete_targets" value="{{ company.id }}">
+                    </td>
+                    <!-- 会社名 -->
+                    <td>
+                        <a href="{{ url_for('show_detail', id=company.id) }}"
+                            style="font-weight: bold; color: #007bff; text-decoration: none;">
+                            {{ company.name }}
+                        </a>
+                    </td>
+                    <!-- 業界 -->
+                    <td style="text-align: center;">
+                        <span>{{ company.industry }}</span>
+                    </td>
+                    <!-- 志望度 -->
+                    <td>
+                        {% if company.interest %}
+                        <span class="interest-badge">★ {{ company.interest }}</span>
+                        {% else %}
+                        <span style="color: #ccc; font-size: 12px;">-</span>
+                        {% endif %}
+                    </td>
+                    <!-- 選考状況 -->
+                    <td style="text-align: center;">
+                        <span>{{ company.selection.status }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
 
     {% if not companies %}
     <p style="text-align: center; color: #777; margin-top: 20px;">
