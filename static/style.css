@@ -287,16 +287,26 @@ body {
 
 /* 3. 見出し（thead）だけの設定 */
 .company-table th {
-    background-color: #b6ffb8;
-    /* ヘッダー色 */
+    background-color: #f8f9fa;
+    /* ほぼ白に近いグレー */
+    color: #495057;
+    /* 真っ黒ではない濃いグレー */
+    border-bottom: 2px solid #e9ecef;
+    /* 下線を引いて区切りを明確に */
+    font-weight: 600;
+    /* 程よい太さ */
+    letter-spacing: 0.05em;
+    /* 文字間隔を少し空け */
+    padding: 12px 10px;
+    /* 余白を広めにとってゆったりさせる */
 }
 
 /* 4. マウスが乗った時に色を変える */
 .company-table tr:hover {
-    background-color: #f5f5f5;
-    /* 薄いグレーに */
-    cursor: pointer;
-    /* マウスカーソルを指の形に */
+    background-color: #f1f8ff !important;
+    /* 薄い水色（!importantで縞模様より優先させる） */
+    transition: background-color 0.2s;
+    /* フワッと色が変わる */
 }
 
 /* 5. 偶数行だけ色を変える */
@@ -314,13 +324,25 @@ input[type="checkbox"] {
     /* カーソルを指にする */
 }
 
+.top_list_companyName {
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+}
+
 /* 内々定の会社の行 */
 .row-gold {
     background-color: #fff0f5 !important;
     /* 薄いピンク */
     border-left: 6px solid #ff69b4 !important;
     /* 左端に濃いピンクの線 */
-    color: #333;
+}
+
+/* 1. 内々定の行のリンク：青をやめて「濃い文字色」にする */
+.row-gold .top_list_companyName {
+    color: #d63384;
+    /* 行の文字色と合わせる */
+    /* もしリンクっぽさを残したいなら、濃いピンク(#d63384)などもアリ */
 }
 
 /* 辞退・お祈りの会社の行 */
@@ -330,6 +352,11 @@ input[type="checkbox"] {
     /* 文字をグレーにして目立たなくする */
 }
 
+.row-gray .top_list_companyName {
+    color: inherit;
+    /* 「親（行）の色を引き継げ」という命令 */
+    text-decoration: none;
+}
 
 /* ============================== */
 /* --- アコーディオンのデザイン --- */
@@ -430,6 +457,25 @@ input[type="checkbox"] {
     /* 上に少し隙間 */
 }
 
+/* 更新ボタン */
+.btn-update {
+    background-color: #28a745;
+    /* 保存っぽい緑色 */
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    /* 大きく押しやすく */
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-update:hover {
+    background-color: #218838;
+}
+
 /* マウスを乗せた時の変化 */
 .btn-register:hover {
     background-color: #0056b3;
@@ -496,10 +542,13 @@ select {
 
 /* 2. メモ欄の高さを確保 */
 textarea {
-    height: 100px;
-    /* 最初から少し高さをとっておく */
+    width: 100%;
     resize: vertical;
-    /* 縦方向だけサイズ変更できるようにする */
+    /* 縦方向だけリサイズ許可（レイアウト崩れ防止） */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
 }
 
 /* 3. ラベル（「イベント名：」などの文字）の設定 */
@@ -518,4 +567,10 @@ label {
 form p {
     margin: 0;
     /* 変な隙間をなくす */
+}
+
+/* 横幅いっぱいに広げるクラス（メモ欄とボタン用） */
+.full-width {
+    grid-column: 1 / -1;
+    /* 左端から右端まで指定 */
 }

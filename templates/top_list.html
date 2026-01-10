@@ -21,6 +21,8 @@
             <a href="{{ url_for('index', industry=request.args.get('industry')) }}" class="btn-sort">登録順</a>
             <a href="{{ url_for('index', sort='interest', industry=request.args.get('industry')) }}"
                 class="btn-sort">志望度順</a>
+            <a href="{{ url_for('index', sort='deadline', deadline=request.args.get('deadline')) }}"
+                class="btn-sort">期限順</a>
         </div>
     </div>
     <div class="toolbar-container">
@@ -60,6 +62,7 @@
                     <th style="text-align: center;">業界</th>
                     <th>志望度</th>
                     <th style="text-align: center;">選考状況</th>
+                    <th style="text-align: center;">期限</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,8 +80,7 @@
                     </td>
                     <!-- 会社名 -->
                     <td>
-                        <a href="{{ url_for('show_detail', id=company.id) }}"
-                            style="font-weight: bold; color: #007bff; text-decoration: none;">
+                        <a href="{{ url_for('show_detail', id=company.id) }}" class="top_list_companyName">
                             {{ company.name }}
                         </a>
                     </td>
@@ -97,6 +99,14 @@
                     <!-- 選考状況 -->
                     <td style="text-align: center;">
                         <span>{{ company.selection.status }}</span>
+                    </td>
+                    <!-- 期限 -->
+                    <td style="text-align: center;">
+                        {% if company.interest %}
+                        <span>{{ company.next_deadline }}</span>
+                        {% else %}
+                        <span style="color: #ccc; font-size: 12px;">-</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

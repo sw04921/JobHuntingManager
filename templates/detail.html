@@ -28,7 +28,7 @@
     <div class="content-box">
         {% block base_info %}
         <div class="info-header">
-            <h3>基本情報</h3>
+            <h3>会社・選考情報</h3>
             <a href="{{ url_for('edit_company', id=company.id) }}" class="btn btn-edit">編集</a>
         </div>
 
@@ -73,17 +73,23 @@
 
         <!-- 詳細情報のブロック　edit_modeでは編集不可-->
         {% block detail_info %}
-        <div class="info-header">
-            <h3>詳細情報</h3>
+        <div class="info-header" id="detail-info-id">
+            <h3>管理・メモ</h3>
         </div>
         {% from "_formhelpers.html" import render_field %}
         {{ info_form.csrf_token }}
         <div class="info-grid">
             <div class="info-item">
-                {{ render_field(info_form.interest) }}
+                {{ render_field(info_form.interest, placeholder="1〜5の数値") }}
             </div>
             <div class="info-item">
-                {{ render_field(info_form.memo) }}
+                {{ render_field(info_form.next_deadline, type="date") }}
+            </div>
+            <div class="info-item full-width">
+                {{ render_field(info_form.memo, rows="5", placeholder="会社の印象や、次のタスクなどの記録") }}
+            </div>
+            <div class="info-item full-width">
+                {{ info_form.submit(class="btn btn-register") }}
             </div>
         </div>
         {% endblock %}
@@ -124,7 +130,7 @@
         <h3>新規イベント登録</h3>
     </div>
     {% from "_formhelpers.html" import render_field %}
-    <form method="POST" novalidate>
+    <form action="{{ url_for('show_detail', id=company.id, _anchor='add-event') }}" method="POST" novalidate>
         {{ schedule_form.csrf_token }}
         {{ render_field(schedule_form.event_name) }}
         {{ render_field(schedule_form.event_content) }}

@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, MetaData
 from flask_migrate import Migrate
+from datetime import date
 
 app = Flask(__name__)
 
@@ -36,10 +37,11 @@ class Company(db.Model):
     url = db.Column(db.String(128))                 # マイページURL
     interest = db.Column(db.Integer)                # 志望度
     memo = db.Column(db.Text)                       # メモ
+    next_deadline = db.Column(db.Date())            # 次回期限
     # リレーション　選考状況テーブル　１対１
     selection = db.relationship("Selection", backref='company', uselist=False)
     # リレーション　スケジュールテーブル　１対多
-    schedules = db.relationship("Schedule", backref='company')
+    schedules = db.relationship("Schedule", backref='company', order_by="desc(Schedule.event_date)")
 
 ## 選考状況テーブル
 class Selection(db.Model):
@@ -82,9 +84,12 @@ def index():
     if sort_mode == 'interest':
         # 志望度順に並び替え　.desc()で降順にする
         query = query.order_by(Company.interest.desc())
+    elif sort_mode == 'deadline':
+        # 期限順に並び替え　今日の日付を取得して、それより後の日付だけを抽出、そこから並び替える
+        query = query.filter(Company.next_deadline >= date.today()).order_by(Company.next_deadline)
     companies = query.all()
     # POST
-    if regist_form.validate_on_submit(): # requeset.method == "POST" and form.validate()と同じ意味
+    if regist_form.validate_on_submit(): # requeset.method == "POST" and form.validate()と同じ意味　　<-----------------会社登録ボタン
         new_company = Company(name=regist_form.name.data, industry=regist_form.industry.data, url=regist_form.url.data)
         db.session.add(new_company)
         db.session.commit()
@@ -104,14 +109,22 @@ def show_detail(id):
     info_form = DetailForm(obj=target, prefix="info") # DBに登録された情報をフォームの初期値とする
     schedule_form = ScheduleForm(prefix="schedule")
     # POST　詳細フォーム
-    if info_form.toTopPage.data and info_form.validate_on_submit(): # バリデーションOKであることを確認する
+    if info_form.toTopPage.data and info_form.validate_on_submit(): # <--      ヘッダー組み込みの保存して戻るボタン
         target.interest = info_form.interest.data
         target.memo = info_form.memo.data
+        target.next_deadline = info_form.next_deadline.data
         db.session.commit()
         # REDIRECT
         return redirect(url_for('index'))
+    if info_form.submit.data and info_form.validate_on_submit(): # <--      管理・メモの保存ボタン
+        target.interest = info_form.interest.data
+        target.memo = info_form.memo.data
+        target.next_deadline = info_form.next_deadline.data
+        db.session.commit()
+        # REDIRECT
+        return redirect(url_for('show_detail', id=id, _anchor=('detail-info-id')))
     # POST スケジュール
-    if schedule_form.submit.data and schedule_form.validate_on_submit(): # どのボタンが押されたかを判断できるようにする
+    if schedule_form.submit.data and schedule_form.validate_on_submit(): # <-- イベント登録ボタン
         new_schedule = Schedule(
             company_id=target.id,
             event_name=schedule_form.event_name.data,
@@ -122,7 +135,7 @@ def show_detail(id):
         db.session.add(new_schedule)
         db.session.commit()
         # REDIRECT
-        return redirect(url_for('show_detail', id=id, _anchor='add-event'))
+        return redirect(url_for('show_detail', id=id, _anchor=('add-event')))
     #GET
     return render_template('detail.html', company=target, info_form=info_form, schedule_form=schedule_form)
 
@@ -145,7 +158,7 @@ def delete_event(id):
     company_id = target.company_id
     db.session.delete(target)
     db.session.commit()
-    return redirect(url_for('show_detail', id=company_id, _anchor='event_list'))
+    return redirect(url_for('show_detail', id=company_id, _anchor='event-list'))
 
 # 基本情報編集
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -175,6 +188,7 @@ def edit_company(id):
             edit_form.phase.data = target.selection.phase
     return render_template('edit_info.html', edit_form=edit_form, company=target)
 
+# イベント編集
 @app.route('/schedule/edit/<int:id>', methods=['GET', 'POST'])
 def edit_event(id):
     target = Schedule.query.filter_by(id=id).first()
