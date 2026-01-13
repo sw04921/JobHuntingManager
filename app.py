@@ -43,13 +43,14 @@ class User(UserMixin, db.Model):
 ## 企業情報テーブル
 class Company(db.Model):
     __tablename__ = 'companies'
-    id = db.Column(db.Integer, primary_key=True)    # ID
-    name = db.Column(db.String(64), nullable=False) # 企業名
-    industry = db.Column(db.String(64))             # 業界
-    url = db.Column(db.String(128))                 # マイページURL
-    interest = db.Column(db.Integer)                # 志望度
-    memo = db.Column(db.Text)                       # メモ
-    next_deadline = db.Column(db.Date())            # 次回期限
+    id = db.Column(db.Integer, primary_key=True)            # ID
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))  #ユーザー判別用ID
+    name = db.Column(db.String(64), nullable=False)         # 企業名
+    industry = db.Column(db.String(64))                     # 業界
+    url = db.Column(db.String(128))                         # マイページURL
+    interest = db.Column(db.Integer)                        # 志望度
+    memo = db.Column(db.Text)                               # メモ
+    next_deadline = db.Column(db.Date())                    # 次回期限
     # リレーション　選考状況テーブル　１対１
     selection = db.relationship("Selection", backref='company', uselist=False)
     # リレーション　スケジュールテーブル　１対多
@@ -77,7 +78,7 @@ class Schedule(db.Model):
 #=========================================
 #------------- ルーティング ---------------
 #=========================================
-from forms import RegistForm, EditForm, DetailForm, ScheduleForm, AuthForm
+from forms import RegistForm, EditForm, DetailForm, ScheduleForm, AuthForm, UserSettingsForm
 
 # ユーザーIDからユーザー情報を取得
 @login_manager.user_loader
@@ -117,11 +118,42 @@ def login():
         flash('ユーザー名またはパスワードが間違っています')
     return render_template('login.html', auth_form=auth_form)
 
+# ログアウト
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+# ユーザー設定
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    form = UserSettingsForm()
+    
+    if form.validate_on_submit():
+        # ユーザー名変更
+        if form.username.data:
+            # 他の人と重複していないか確認（自分自身の名前は可）
+            existing_user = User.query.filter_by(username=form.username.data).first()
+            if existing_user and existing_user.id != current_user.id:
+                flash('そのユーザー名は既に使用されています')
+                return redirect(url_for('settings'))
+            current_user.username = form.username.data
+        
+        # パスワード変更（入力がある場合のみ）
+        if form.new_password.data:
+            current_user.password = generate_password_hash(form.new_password.data, method='scrypt')
+            
+        db.session.commit()
+        flash('ユーザー情報を更新しました')
+        return redirect(url_for('index'))
+
+    # 初期値として現在のユーザー名を入れる
+    if request.method == 'GET':
+        form.username.data = current_user.username
+
+    return render_template('settings.html', form=form)
 
 # トップページ　表示
 @app.route('/', methods=['GET', 'POST'])
@@ -130,11 +162,13 @@ def index():
     regist_form = RegistForm()
     sort_mode = request.args.get('sort')
     filter_industry = request.args.get('industry')
-    query = Company.query
-    all_companies = Company.query.all()
+    # 自身のIDのデータだけ集める
+    base_query = Company.query.filter_by(user_id=current_user.id)
+    all_companies = base_query.all()
     # 存在する企業名の配列を作成　すべての企業からNone以外を集めて、set()で重複を削除、listで配列に戻して、sortedで並べ替え
     # 並べ替えるとページ更新時に見やすくなる
     industries = sorted(list(set([c.industry for c in all_companies if c.industry])))
+    query = base_query
     if filter_industry:
         # 業界で絞り込み
         query = query.filter(Company.industry == filter_industry)
@@ -147,7 +181,12 @@ def index():
     companies = query.all()
     # POST
     if regist_form.validate_on_submit(): # requeset.method == "POST" and form.validate()と同じ意味　　<-----------------会社登録ボタン
-        new_company = Company(name=regist_form.name.data, industry=regist_form.industry.data, url=regist_form.url.data)
+        new_company = Company(
+            name=regist_form.name.data,
+            industry=regist_form.industry.data,
+            url=regist_form.url.data,
+            user_id=current_user.id
+        )
         db.session.add(new_company)
         db.session.commit()
         # REDIRECT
@@ -163,7 +202,7 @@ def index():
 @app.route('/detail/<int:id>', methods=['GET', 'POST'])
 @login_required
 def show_detail(id):
-    target = Company.query.filter_by(id=id).first()
+    target = Company.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     info_form = DetailForm(obj=target, prefix="info") # DBに登録された情報をフォームの初期値とする
     schedule_form = ScheduleForm(prefix="schedule")
     # POST　詳細フォーム
@@ -224,7 +263,7 @@ def delete_event(id):
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_company(id):
-    target = Company.query.filter_by(id=id).first()
+    target = Company.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     edit_form = EditForm(obj=target) # DBに登録された情報をフォームの初期値とする
     # POST
     if edit_form.validate_on_submit():
@@ -253,7 +292,7 @@ def edit_company(id):
 @app.route('/schedule/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_event(id):
-    target = Schedule.query.filter_by(id=id).first()
+    target = Schedule.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     schedule_form = ScheduleForm(obj=target) # DBに登録された情報をフォームの初期値とする
     event_company = Company.query.filter_by(id=target.company_id).first()
     # POST

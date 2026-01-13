@@ -1,0 +1,56 @@
+{% extends "index.html" %}
+
+{% block title %}ユーザー設定{% endblock %}
+
+{% block header %}
+<div class="title-group">
+    <h1>ユーザー設定</h1>
+</div>
+<nav class="action-buttons">
+    <a href="{{ url_for('index') }}" class="header-link">トップへ戻る</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <div class="info-header">
+        <h3>登録情報の変更</h3>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul style="color: blue; list-style: none; padding: 0;">
+        {% for message in messages %}
+        <li>✓ {{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" novalidate>
+        {{ form.csrf_token }}
+        <div class="info-item">
+            {{ render_field(form.username, placeholder="新しいユーザー名") }}
+        </div>
+        <div class="info-item">
+            <label for="new_password">新しいパスワード（変更する場合のみ入力）</label>
+            {{ form.new_password(class="form-control", placeholder="新しいパスワード") }}
+        </div>
+        <div class="info-item full-width">
+            {{ form.submit(class="btn btn-update", value="情報を更新する") }}
+        </div>
+    </form>
+</div>
+
+<div class="content-box" style="border-color: #dc3545;">
+    <div class="info-header" style="border-bottom: none;">
+        <h3 style="color: #dc3545;">ログアウト</h3>
+    </div>
+    <p>現在の端末からログアウトします。</p>
+    <a href="{{ url_for('logout') }}" class="btn btn-delete"
+        style="text-align:center; display:block; text-decoration:none;">ログアウトする</a>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

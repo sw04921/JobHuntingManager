@@ -14,6 +14,12 @@ class AuthForm(FlaskForm):
     password = PasswordField('パスワード', validators=[DataRequired('入力必須です')])
     submit = SubmitField('送信')
 
+# ユーザー情報変更用フォーム
+class UserSettingsForm(FlaskForm):
+    username = StringField('ユーザー名', validators=[DataRequired()])
+    new_password = PasswordField('新しいパスワード', validators=[Optional()]) # 空欄なら変更しない
+    submit = SubmitField('更新する')
+
 # トップページ会社登録用フォーム
 class RegistForm(FlaskForm):
     name = StringField('会社名', validators=[DataRequired('入力必須です')])
