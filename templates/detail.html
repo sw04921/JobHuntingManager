@@ -80,7 +80,7 @@
         {{ info_form.csrf_token }}
         <div class="info-grid">
             <div class="info-item">
-                {{ render_field(info_form.interest, placeholder="1〜5の数値") }}
+                {{ render_field(info_form.interest, placeholder="1以上の数値") }}
             </div>
             <div class="info-item">
                 {{ render_field(info_form.next_deadline, type="date") }}
