@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, MetaData
 from flask_migrate import Migrate
@@ -242,7 +242,7 @@ def show_detail(id):
 def delete_company():
     ids = request.form.getlist('delete_targets')
     for delete_id in ids:
-        target = Company.query.filter_by(id=delete_id).first()
+        target = Company.query.filter_by(id=delete_id, user_id=current_user.id).first()
         # 存在しない会社を削除しようとしてエラーになるのを防ぐ
         if target:
             db.session.delete(target)
@@ -254,10 +254,13 @@ def delete_company():
 @login_required
 def delete_event(id):
     target = Schedule.query.filter_by(id=id).first()
-    company_id = target.company_id
-    db.session.delete(target)
-    db.session.commit()
-    return redirect(url_for('show_detail', id=company_id, _anchor='event-list'))
+    # イベントが存在し、かつ「そのイベントの会社」が自分のものである場合のみ削除
+    if target and target.company.user_id == current_user.id:
+        company_id = target.company_id
+        db.session.delete(target)
+        db.session.commit()
+        return redirect(url_for('show_detail', id=company_id, _anchor='event-list'))
+    return redirect(url_for('index'))
 
 # 基本情報編集
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -292,7 +295,10 @@ def edit_company(id):
 @app.route('/schedule/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_event(id):
-    target = Schedule.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    target = Schedule.query.filter_by(id=id).first_or_404()
+    # 権限チェック：そのイベントの親会社が自分のものでなければ 403 Forbidden
+    if target.company.user_id != current_user.id:
+        abort(403)
     schedule_form = ScheduleForm(obj=target) # DBに登録された情報をフォームの初期値とする
     event_company = Company.query.filter_by(id=target.company_id).first()
     # POST
