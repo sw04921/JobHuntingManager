@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, MetaData
 from flask_migrate import Migrate
 from datetime import date
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -24,9 +26,19 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
 Migrate(app, db, render_as_batch=True)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 #===================================
 #------------- モデル ---------------
 #===================================
+
+## ユーザーデータベース
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
 
 ## 企業情報テーブル
 class Company(db.Model):
@@ -67,8 +79,51 @@ class Schedule(db.Model):
 #=========================================
 from forms import RegistForm, EditForm, DetailForm, ScheduleForm
 
+# ユーザーIDからユーザー情報を取得
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # 同名のユーザーがいないかチェック
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('そのユーザー名は既に使用されています')
+            return redirect(url_for('signup'))
+        # パスワードを暗号化して保存
+        new_user = User(username=username, password=generate_password_hash(password, method='scrypt'))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('signup.html')
+
+# ログイン
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        # ユーザーが存在し、パスワードが合致する場合
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        flash('ユーザー名またはパスワードが間違っています')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 # トップページ　表示
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     regist_form = RegistForm()
     sort_mode = request.args.get('sort')
@@ -104,6 +159,7 @@ def index():
 
 # 詳細ページ　表示
 @app.route('/detail/<int:id>', methods=['GET', 'POST'])
+@login_required
 def show_detail(id):
     target = Company.query.filter_by(id=id).first()
     info_form = DetailForm(obj=target, prefix="info") # DBに登録された情報をフォームの初期値とする
@@ -141,6 +197,7 @@ def show_detail(id):
 
 # 会社情報削除処理
 @app.route('/delete_selected', methods=['POST'])
+@login_required
 def delete_company():
     ids = request.form.getlist('delete_targets')
     for delete_id in ids:
@@ -153,6 +210,7 @@ def delete_company():
 
 # イベント情報削除処理
 @app.route('/schedule/delete/<int:id>', methods=['POST'])
+@login_required
 def delete_event(id):
     target = Schedule.query.filter_by(id=id).first()
     company_id = target.company_id
@@ -162,6 +220,7 @@ def delete_event(id):
 
 # 基本情報編集
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_company(id):
     target = Company.query.filter_by(id=id).first()
     edit_form = EditForm(obj=target) # DBに登録された情報をフォームの初期値とする
@@ -190,6 +249,7 @@ def edit_company(id):
 
 # イベント編集
 @app.route('/schedule/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_event(id):
     target = Schedule.query.filter_by(id=id).first()
     schedule_form = ScheduleForm(obj=target) # DBに登録された情報をフォームの初期値とする
