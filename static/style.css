@@ -49,6 +49,17 @@ body {
     /* 左右に要素を配置 */
     align-items: center;
     /* 上下中央揃え */
+    gap: 15px;
+}
+
+.sticky-header nav {
+    /* 左側の余白を「自動」にすると、右端に */
+    margin-left: auto;
+
+    /* メニュー内のリンクたちを横並びにして整える */
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 /* --- 左側グループ（会社名まわり） --- */
@@ -60,15 +71,36 @@ body {
     /* 要素ごとの間隔 */
 }
 
-/* 会社名 */
+/* 1. 詳細ページ：会社名（.title-group h1） */
+/* 意図：長い会社名は画面からはみ出さずに、改行してほしい */
 .title-group h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 1.75rem;
+    /* PC: 28px */
     color: #333;
     font-weight: 700;
     line-height: 1.2;
-    word-break: break-all;
+
+    /* ▼▼▼ 改行設定：自然に改行させる ▼▼▼ */
+    white-space: normal;
+    word-break: break-word;
+    /* 長すぎる単語でも途中で折り返す */
 }
+
+/* 2. トップページ：アプリ名（.app-title h1） */
+/* 意図：「就活管理」は絶対に改行させない */
+.app-title h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    /* PC: 28px */
+    color: #333;
+    font-weight: 700;
+    line-height: 1.2;
+
+    /* ▼▼▼ 改行禁止 ▼▼▼ */
+    white-space: nowrap;
+}
+
 
 /* --- 右側（ボタン） --- */
 .action-buttons {
@@ -219,11 +251,33 @@ body {
     font-size: 13px;
     margin-left: 5px;
     transition: 0.2s;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .btn-sort:hover {
     background-color: #e9ecef;
     color: #000;
+}
+
+.sort-buttons {
+    display: flex;
+    /* フレックスボックスを使う */
+    flex-wrap: wrap;
+    /* 画面幅が足りないときは折り返す */
+    align-items: center;
+    /* 上下中央揃え */
+    gap: 8px;
+    /* ボタン同士の隙間（上下左右）を一括指定 */
+    margin-bottom: 10px;
+    /* 下との隙間 */
+}
+
+/* 既存の「並び替え:」という文字（spanタグ）の調整 */
+.sort-buttons span {
+    white-space: nowrap;
+    /* 「並び替え:」も改行させない */
+    margin-right: 5px;
 }
 
 /* --- 志望度のバッジ --- */
@@ -607,4 +661,189 @@ form p {
 .full-width {
     grid-column: 1 / -1;
     /* 左端から右端まで指定 */
+}
+
+/* ==================================== */
+/* --- スマホ対応：表をカード型にする --- */
+/* ==================================== */
+
+@media (max-width: 600px) {
+
+    /* 1. コンテナの余白を少し狭くして画面を有効活用 */
+    .container {
+        padding: 10px;
+    }
+
+    /* 2. PC用の見出し行（thead）を隠す */
+    .company-table thead {
+        display: none;
+    }
+
+    /* 3. 各行（tr）を独立した「カード」のような箱にする */
+    .company-table tr {
+        display: block;
+        /* 表の行としての性質を消す */
+        margin-bottom: 20px;
+        /* カード間の隙間 */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        /* 角丸 */
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        /* 影をつける */
+        overflow: hidden;
+        /* はみ出し防止 */
+    }
+
+    /* 4. 各セル（td）を縦積みに変更 */
+    .company-table td {
+        display: flex;
+        /* フレックスボックスにして左右配置しやすく */
+        justify-content: space-between;
+        /* ラベルと中身を左右に離す */
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: right;
+        /* 中身は右寄せ */
+    }
+
+    .company-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* --- 列ごとの個別設定 --- */
+
+    /* 1列目（チェックボックス）と2列目（会社名）をヘッダー風にする */
+    .company-table td:nth-of-type(1) {
+        background-color: #f8f9fa;
+        justify-content: flex-start;
+        /* 左寄せ */
+        padding-bottom: 5px;
+        border-bottom: none;
+        /* 下線なしで会社名と繋げる */
+    }
+
+    .company-table td:nth-of-type(2) {
+        display: block;
+        /* 会社名はブロック表示 */
+        text-align: left;
+        /* 左寄せ */
+        font-size: 18px;
+        /* 文字を大きく */
+        font-weight: bold;
+        background-color: #f8f9fa;
+        /* 1列目と同じ背景色 */
+        padding-top: 0;
+        border-bottom: 2px solid #ddd;
+        /* ヘッダーの区切り線 */
+
+        /* PC用の幅制限を解除 */
+        width: auto;
+        max-width: none;
+    }
+
+    /* --- CSSで擬似的に「項目名」を追加する --- */
+    /* HTMLをいじらずに、CSSだけで「業界」「志望度」などのラベルを表示させます */
+
+    .company-table td:nth-of-type(3)::before {
+        content: "業界";
+        font-weight: bold;
+        color: #777;
+    }
+
+    .company-table td:nth-of-type(4)::before {
+        content: "志望度";
+        font-weight: bold;
+        color: #777;
+    }
+
+    .company-table td:nth-of-type(5)::before {
+        content: "選考状況";
+        font-weight: bold;
+        color: #777;
+    }
+
+    .company-table td:nth-of-type(6)::before {
+        content: "次回期限";
+        font-weight: bold;
+        color: #777;
+    }
+
+    /* 5. 削除ボタンのエリア調整 */
+    .toolbar-container {
+        flex-direction: column;
+        /* 縦並びにする */
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .filter-box {
+        width: 100%;
+    }
+
+    .filter-form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .select-industry {
+        flex-grow: 1;
+        margin-left: 10px;
+    }
+
+    .btn-delete-action {
+        width: 100%;
+        /* ボタンを横幅いっぱいに */
+    }
+}
+
+/* --- スマホ対応（文字サイズ調整） --- */
+@media (max-width: 600px) {
+
+    /* 会社名もアプリ名も、スマホでは少し小さくして収まりよくする */
+    .title-group h1,
+    .app-title h1 {
+        font-size: 1.25rem;
+        /* スマホ: 20px */
+    }
+
+    .sticky-header {
+        padding: 5px 0;
+        /* PCの15pxから大幅に減らす */
+        min-height: 50px;
+        /* 最低限の高さは確保 */
+    }
+
+    .sticky-header nav {
+        gap: 10px;
+        /* スマホでは間隔を少し狭く */
+    }
+
+    .header-link {
+        font-size: 0.85rem;
+        /* 文字を少し小さくして収める */
+    }
+
+    /* タイトルの行間も少し詰める */
+    .title-group h1 {
+        line-height: 1.1;
+        /* 改行した時の行間を狭く */
+        font-size: 1.25rem;
+        /* さっきの設定（そのまま確認用） */
+    }
+
+    /* 右側のボタン群（保存して戻る、など）も少し小さくしてバランスを取る */
+    .action-buttons .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .header-link {
+        font-size: 10px;
+        /* 文字を少し小さくして収める */
+    }
 }
