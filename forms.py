@@ -4,8 +4,15 @@ from wtforms import (
     SubmitField, DateField, SelectField
 )
 from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms import PasswordField
 
 #フォームを分けないと入力情報の不備でDB登録処理がスキップされる
+
+# ユーザー登録・ログイン用フォーム
+class AuthForm(FlaskForm):
+    username = StringField('ユーザー名', validators=[DataRequired('入力必須です')])
+    password = PasswordField('パスワード', validators=[DataRequired('入力必須です')])
+    submit = SubmitField('送信')
 
 # トップページ会社登録用フォーム
 class RegistForm(FlaskForm):

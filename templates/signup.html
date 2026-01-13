@@ -1,1 +1,39 @@
 {% extends "index.html" %}
+
+{% block title %}ユーザー登録{% endblock %}
+
+{% block header %}
+<div class="title-group">
+    <h1>ユーザー登録</h1>
+</div>
+<nav class="action-buttons">
+    <a href="{{ url_for('login') }}" class="header-link">ログインへ</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <div class="info-header">
+        <h3>新規アカウント作成</h3>
+    </div>
+
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" novalidate>
+        {{ auth_form.csrf_token }}
+
+        <div class="info-item">
+            {{ render_field(auth_form.username, placeholder="ユーザー名を入力") }}
+        </div>
+
+        <div class="info-item">
+            {{ render_field(auth_form.password, placeholder="パスワードを入力") }}
+        </div>
+
+        <div class="info-item full-width">
+            {{ auth_form.submit(class="btn btn-register", value="登録する") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

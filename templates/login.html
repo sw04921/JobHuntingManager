@@ -1,1 +1,49 @@
 {% extends "index.html" %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block header %}
+<div class="title-group">
+    <h1>就活管理アプリ</h1>
+</div>
+<nav class="action-buttons">
+    <a href="{{ url_for('signup') }}" class="header-link">新規登録へ</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <div class="info-header">
+        <h3>ログイン</h3>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul style="color: red; list-style: none; padding: 0; margin-bottom: 15px;">
+        {% for message in messages %}
+        <li>⚠ {{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" novalidate>
+        {{ auth_form.csrf_token }}
+
+        <div class="info-item">
+            {{ render_field(auth_form.username, placeholder="ユーザー名") }}
+        </div>
+
+        <div class="info-item">
+            {{ render_field(auth_form.password, placeholder="パスワード") }}
+        </div>
+
+        <div class="info-item full-width">
+            {{ auth_form.submit(class="btn btn-register", value="ログイン") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

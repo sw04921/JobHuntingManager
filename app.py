@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, MetaData
 from flask_migrate import Migrate
@@ -77,7 +77,7 @@ class Schedule(db.Model):
 #=========================================
 #------------- ルーティング ---------------
 #=========================================
-from forms import RegistForm, EditForm, DetailForm, ScheduleForm
+from forms import RegistForm, EditForm, DetailForm, ScheduleForm, AuthForm
 
 # ユーザーIDからユーザー情報を取得
 @login_manager.user_loader
@@ -86,9 +86,10 @@ def load_user(user_id):
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    auth_form = AuthForm()
+    if auth_form.validate_on_submit():
+        username = auth_form.username.data
+        password = auth_form.password.data
         # 同名のユーザーがいないかチェック
         user = User.query.filter_by(username=username).first()
         if user:
@@ -99,21 +100,22 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
-    return render_template('signup.html')
+    return render_template('signup.html', auth_form=auth_form)
 
 # ログイン
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    auth_form = AuthForm()
+    if auth_form.validate_on_submit():
+        username = auth_form.username.data
+        password = auth_form.password.data
         user = User.query.filter_by(username=username).first()
         # ユーザーが存在し、パスワードが合致する場合
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
         flash('ユーザー名またはパスワードが間違っています')
-    return render_template('login.html')
+    return render_template('login.html', auth_form=auth_form)
 
 @app.route('/logout')
 @login_required
