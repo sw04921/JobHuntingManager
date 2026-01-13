@@ -241,7 +241,7 @@ body {
 /* テーブルの見出し調整 */
 .company-table th {
     background-color: #f1f1f1;
-    /* 少し落ち着いたグレーに（緑がきつい場合） */
+    /* 少し落ち着いたグレーに */
     color: #333;
     font-weight: bold;
     border-bottom: 2px solid #ddd;
